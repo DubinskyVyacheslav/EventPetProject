@@ -13,9 +13,13 @@ import java.util.Scanner;
 public class EventServiceImpl {
 
     static Scanner scanner = new Scanner(System.in);
-    private static final EventRepositoryImpl eventRepository = new EventRepositoryImpl();
+    private static EventRepositoryImpl eventRepository;
 
-    public static void createEvent() {
+    public EventServiceImpl(EventRepositoryImpl eventRepository) {
+        this.eventRepository = eventRepository;
+    }
+
+    public void createEvent() {
 
         for (int attempts = 0; attempts < 5; attempts++) {
             System.out.print("Введите название ивента :");
@@ -74,8 +78,8 @@ public class EventServiceImpl {
 
     }
 
-    public static void delete() {
-        String deleteEventName = "";
+    public  void delete() {
+        String deleteEventName ;
         for (int attempts = 0; attempts < 5; attempts++) {
             System.out.println("Введите название мероприятия которые хотите удалить");
             System.out.print("Ввод : ");
@@ -98,57 +102,13 @@ public class EventServiceImpl {
         }
         watchAllEvent();
 
-        String eventName = "";
-        Optional<Event> event = Optional.empty();
-        flag:
-        for (int attempts = 0; attempts < 5; attempts++) {
-            System.out.println("Введите название мероприятия");
-            System.out.print("Ввод : ");
-            eventName = scanner.nextLine();
-            event = getEvent(eventName);
-            if (event.isPresent()) {
+        Result result = getChooseEvent();
+        if (result == null) return;
 
-                System.out.println("Такое мероприятия существует");
-                System.out.println("Хотите его изменить");
-                System.out.println("""
-                        1.Да
-                        2.Нет
-                        """);
-                switch (scanner.nextLine().trim()) {
-                    case "1", "да" -> {
-                        break flag;
-                    }
-                    case "2", "нет" -> {
-                        return;
-                    }
-                    default -> {
-                        System.out.println("Неверный ввод");
-                        attempts++;
-                        if (attempts > 3) System.exit(0);
-                    }
-                }
-            } else {
-                System.out.println("Такого мероприятия не существует");
-                System.out.println("Хотите продолжить?");
-                System.out.println("""
-                        1.Да
-                        2.Нет
-                        """);
-                switch (scanner.nextLine().trim().toLowerCase()) {
-                    case "1", "да" -> {
-                    }
-                    case "2", "нет" -> {
-                        return;
-                    }
-                    default -> {
-                        System.out.println("Неправильный ввод");
-                        attempts++;
-                        if (attempts > 3) System.exit(0);
-                    }
-                }
-            }
-        }
+        chooseRedact(result);
+    }
 
+    private static void chooseRedact(Result result) {
         System.out.println("Что хотите изменить?");
         System.out.println("""
                 1.Название мероприятия
@@ -173,10 +133,10 @@ public class EventServiceImpl {
             System.out.print("Ввод : ");
             step = scanner.nextLine().trim();
             switch (step) {
-                case "1", "название" -> redactNameEvent(eventName);
-                case "2", "дату" -> redactDateEvent(event.get());
-                case "3", "статус" -> redactStatusEvent(event.get());
-                case "4", "город" -> redactTownEvent(event.get());
+                case "1", "название" -> redactNameEvent(result.eventName());
+                case "2", "дату" -> redactDateEvent(result.event().get());
+                case "3", "статус" -> redactStatusEvent(result.event().get());
+                case "4", "город" -> redactTownEvent(result.event().get());
                 case "0", "ничего" -> {
                     return;
                 }
@@ -187,6 +147,64 @@ public class EventServiceImpl {
                 }
             }
         }
+    }
+
+    private static Result getChooseEvent() {
+        String eventName = "";
+        Optional<Event> event = Optional.empty();
+        flag:
+        for (int attempts = 0; attempts < 5; attempts++) {
+            System.out.println("Введите название мероприятия");
+            System.out.print("Ввод : ");
+            eventName = scanner.nextLine();
+            event = getEvent(eventName);
+            if (event.isPresent()) {
+
+                System.out.println("Такое мероприятия существует");
+                System.out.println("Хотите его изменить");
+                System.out.println("""
+                        1.Да
+                        2.Нет
+                        """);
+                switch (scanner.nextLine().trim()) {
+                    case "1", "да" -> {
+                        break flag;
+                    }
+                    case "2", "нет" -> {
+                        return null;
+                    }
+                    default -> {
+                        System.out.println("Неверный ввод");
+                        attempts++;
+                        if (attempts > 3) System.exit(0);
+                    }
+                }
+            } else {
+                System.out.println("Такого мероприятия не существует");
+                System.out.println("Хотите продолжить?");
+                System.out.println("""
+                        1.Да
+                        2.Нет
+                        """);
+                switch (scanner.nextLine().trim().toLowerCase()) {
+                    case "1", "да" -> {
+                    }
+                    case "2", "нет" -> {
+                        return null;
+                    }
+                    default -> {
+                        System.out.println("Неправильный ввод");
+                        attempts++;
+                        if (attempts > 3) System.exit(0);
+                    }
+                }
+            }
+        }
+        Result result = new Result(eventName, event);
+        return result;
+    }
+
+    private record Result(String eventName, Optional<Event> event) {
     }
 
 
@@ -248,11 +266,11 @@ public class EventServiceImpl {
 
     }
 
-    private static boolean checkRecordedEvent(Person person, Event event) {
+    private  boolean checkRecordedEvent(Person person, Event event) {
         return EventRepositoryImpl.checkRecordedEvent(person, event);
     }
 
-    public static void signUpForAnEvent(Person person) {
+    public  void signUpForAnEvent(Person person) {
 
         if (EventRepositoryImpl.getAllEvent().isEmpty()) {
             System.out.println("Мероприятий нету");
@@ -297,7 +315,7 @@ public class EventServiceImpl {
 
     }
 
-    public static void checkWhatEventsRecorded(Person person) {
+    public  void checkWhatEventsRecorded(Person person) {
         List<Event> eventList = EventRepositoryImpl.checkWhatEventsRecorded(person);
         if (!eventList.isEmpty()) {
             System.out.println("Ты записан на эти мероприятия");
@@ -316,7 +334,7 @@ public class EventServiceImpl {
 
     }
 
-    public static void withdrawFromTheEvent(Person person) {
+    public  void withdrawFromTheEvent(Person person) {
         List<Event> eventList = EventRepositoryImpl.checkWhatEventsRecorded(person);
         if (!eventList.isEmpty()) {
             eventList.forEach(System.out::println);

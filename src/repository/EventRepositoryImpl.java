@@ -117,7 +117,7 @@ public class EventRepositoryImpl {
 
             String sql = "UPDATE event SET participant_ids = array_append(participant_ids, ?) WHERE id = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setObject(1, UUID.fromString(person.getUUID()));
+            statement.setObject(1, person.getUuid());
             statement.setInt(2, event.getId());
             statement.executeUpdate();
 
@@ -134,7 +134,7 @@ public class EventRepositoryImpl {
         try (Connection connection = ConnectionManager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setObject(1, UUID.fromString(person.getUUID()));
+            statement.setObject(1, person.getUuid());
             statement.setInt(2, event.getId());
 
             ResultSet query = statement.executeQuery();
@@ -154,7 +154,7 @@ public class EventRepositoryImpl {
 
             String sql = "SELECT * FROM event WHERE ? = ANY(participant_ids)";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setObject(1, UUID.fromString(person.getUUID()));
+            statement.setObject(1, person.getUuid());
             ResultSet query = statement.executeQuery();
             while (query.next()) {
                 int id = query.getInt("id");
@@ -201,7 +201,7 @@ public class EventRepositoryImpl {
 
             String sql = "UPDATE event SET participant_ids = array_remove(participant_ids, ?) WHERE id = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setObject(1, UUID.fromString(person.getUUID()));
+            statement.setObject(1, person.getUuid());
             statement.setObject(2, eventid);
             statement.executeUpdate();
 
