@@ -1,9 +1,10 @@
 package controller;
 
+import lombok.extern.slf4j.Slf4j;
 import service.PersonService;
 
 import java.util.Scanner;
-
+@Slf4j
 public class PersonController {
 
     PersonService personService;
@@ -15,6 +16,7 @@ public class PersonController {
     }
 
     public void welcomePerson() {
+        log.info("Старт");
         System.out.println("Здравствуйте !");
         System.out.println("""
                 1.Войти

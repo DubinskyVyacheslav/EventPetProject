@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 
 public class EventRepositoryImpl {
@@ -127,7 +126,7 @@ public class EventRepositoryImpl {
 
     }
 
-    public static boolean checkRecordedEvent(Person person, Event event) {
+    public static boolean checkRecordedEvent(Person person, Event event) {  // Проверяет записн ли человек на определенное мероприятие
 
         String sql = "SELECT ? = ANY(participant_ids) AS registered FROM event WHERE id = ?";
 
@@ -148,7 +147,7 @@ public class EventRepositoryImpl {
         return false;
     }
 
-    public static List<Event> checkWhatEventsRecorded(Person person) {   // Даёт List Evenтов на которые записан человек
+    public static List<Event> checkWhatEventsRecorded(Person person) {   // Даёт List мероприятий на которые записан человек
         List<Event> events = new ArrayList<>();
         try (Connection connection = ConnectionManager.getConnection()) {
 

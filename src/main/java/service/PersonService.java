@@ -1,18 +1,21 @@
 package service;
 
+import lombok.extern.slf4j.Slf4j;
 import model.Person;
-import repository.EventRepositoryImpl;
+import model.Role;
 import repository.PersonRepositoryImpl;
 import util.Text;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.UUID;
 
+@Slf4j
 public class PersonService {
 
     PersonRepositoryImpl personRepository;
-    EventServiceImpl eventService ;
+    EventServiceImpl eventService;
     Scanner scanner = new Scanner(System.in);
     Person person;
 
@@ -120,10 +123,10 @@ public class PersonService {
         for (int attempts = 0; attempts < 4; attempts++) {
             System.out.println("Введите имя пользователя которого хотите удалить");
             System.out.print("Ввод :");
-            String personName = scanner.nextLine();
+            String personLogin = scanner.nextLine();
             try {
                 Person deletePerson = personList.stream()
-                        .filter(person -> person.getName().equalsIgnoreCase(personName))
+                        .filter(person -> person.getLogin().equalsIgnoreCase(personLogin))
                         .findFirst()
                         .get();
                 return deletePerson;
@@ -152,5 +155,42 @@ public class PersonService {
     }
 
     public void create() {
+        String login;
+        for (int i = 0; true; i++) {
+            System.out.println("Введите логин");
+            System.out.println("Ввод :");
+            login = scanner.nextLine();
+            if (login.equalsIgnoreCase(personRepository.originalsName(login)) || login.length() > 20 || login.length() < 6) {
+                System.out.println("Такой логин уже существует или количество символов для логина превышает предел(Предел = 20 символов).");
+                if (i == 4) {
+                    log.error("4 раза ввел неправильно");
+                    log.error(Text.getTextLogError(this.getClass()));
+                    System.exit(0);
+                }
+                continue;
+            }
+            break;
+        }
+
+        System.out.print("Введите пароль");
+        String password;
+        for (int i = 0; true; i++) {
+            System.out.print("Ввод :");
+            password = scanner.nextLine();
+            if (password.length() > 20 || password.length() < 6) {
+                System.out.println("Пароль должен должен быть больше 6 символов и меньше 20");
+                if (i == 4) {
+                    log.error("Превышено кол-во попыток ");
+                    log.error(Text.getTextLogError(this.getClass()));
+                    System.exit(0);
+                }
+                continue;
+            }
+            break;
+        }
+        Person person = new Person(UUID.randomUUID(), login, Role.values()[0].toString());
+        personRepository.create(person);
+        userPath(person);
+
     }
 }

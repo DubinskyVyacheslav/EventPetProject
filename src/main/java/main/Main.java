@@ -1,17 +1,6 @@
 package main;
 
-import model.Person;
-import repository.EventRepositoryImpl;
-import repository.PersonRepositoryImpl;
-import service.EventServiceImpl;
-import service.PersonService;
-import util.ConnectionManager;
 import util.Menu;
-import util.Text;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 public class Main {
 

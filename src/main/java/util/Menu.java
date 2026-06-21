@@ -14,7 +14,7 @@ public class Menu {
         PersonRepositoryImpl personRepository = new PersonRepositoryImpl();
         PersonService personService = new PersonService(personRepository,eventService);
         PersonController personController = new PersonController(personService);
-        personService.enter();
+        personController.welcomePerson();
     }
 
 
